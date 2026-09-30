@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Medicare Advantage Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a Power BI-style report canvas. Header, slicer row, KPI cards, then a two-column grid of visuals, then a model/measures panel. */
+:root{
+  --bg:#EEF1EF; --surface:#FFFFFF; --ink:#14201D; --muted:#56635F; --line:#D6DDD8; --grid:#E7ECE9;
+  --accent:#0E6E5C; --accent-soft:#E1EFEA;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --s5:#e87ba4; --s6:#008300;
+  --ref:#9AA4A1; --ref-soft:#C9D0CD; --bar:#9DB6D3;
+  --seq-lo:#dce9fb; --seq-hi:#0d366b;
+  --display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1614; --surface:#17211E; --ink:#E6ECE9; --muted:#9AA8A3; --line:#2A3632; --grid:#233029;
+  --accent:#4FC2A8; --accent-soft:#17332C;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#008300;
+  --ref:#6E7A76; --ref-soft:#3A4541; --bar:#34506F;
+  --seq-lo:#1b2a3a; --seq-hi:#9ec5f4; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1614; --surface:#17211E; --ink:#E6ECE9; --muted:#9AA8A3; --line:#2A3632; --grid:#233029;
+  --accent:#4FC2A8; --accent-soft:#17332C;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#008300;
+  --ref:#6E7A76; --ref-soft:#3A4541; --bar:#34506F;
+  --seq-lo:#1b2a3a; --seq-hi:#9ec5f4; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:14px;line-height:1.5;padding-inline:16px;padding-block:0;margin:0}
+.wrap{max-width:1240px;margin:0 auto;padding-block:24px 56px;display:grid;gap:16px}
+h1,h2{font-family:var(--display);margin:0;text-wrap:balance;line-height:1.15}
+h1{font-size:clamp(1.5rem,3.2vw,2.1rem);font-weight:800}
+h2{font-size:1rem;font-weight:700}
+p{margin:0}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.eyebrow{font-family:var(--mono);font-size:.72rem;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.head{display:grid;gap:6px}
+.head .sub{color:var(--muted);max-width:80ch}
+.byline{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center}
+.byline a{font-family:var(--mono);font-size:.75rem;text-decoration:none}
+.slicers{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:end;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 16px}
+.slicer{display:grid;gap:4px}
+.slicer label{font-family:var(--mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.slicer select{font:500 .9rem var(--body);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:6px 10px;min-width:170px}
+.slicers .reset{margin-left:auto;font:500 .8rem var(--mono);background:transparent;color:var(--accent);border:1px solid var(--line);border-radius:6px;padding:6px 10px;cursor:pointer}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 16px;display:grid;gap:4px;align-content:start}
+.kpi .l{font-size:.8rem;color:var(--muted)}
+.kpi .v{font-family:var(--display);font-weight:800;font-size:clamp(1.4rem,2.6vw,1.9rem);font-variant-numeric:tabular-nums;line-height:1.1}
+.kpi .d{font-family:var(--mono);font-size:.74rem;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px 16px;display:grid;gap:8px;align-content:start;min-width:0}
+.panel.wide{grid-column:1/-1}
+.panel .ph{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.panel .ps{font-size:.8rem;color:var(--muted)}
+.chart{position:relative;min-width:0}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.78rem;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:12px;height:3px;border-radius:2px;display:inline-block}
+.legend i.sq{height:10px;width:10px;border-radius:2px}
+svg text{font-family:var(--body);font-size:11px;fill:var(--muted)}
+svg .ax{font-variant-numeric:tabular-nums}
+svg .lbl{fill:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+svg .grid{stroke:var(--grid);stroke-width:1}
+svg .base{stroke:var(--line);stroke-width:1}
+svg .ln{fill:none;stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+svg .xh{stroke:var(--muted);stroke-width:1}
+svg .ann{stroke:var(--ref);stroke-width:1}
+svg .ring{stroke:var(--surface);stroke-width:2}
+.tip{position:fixed;z-index:10;pointer-events:none;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:8px 10px;font-size:.8rem;box-shadow:0 6px 20px rgb(0 0 0/.14);max-width:260px}
+.tip b{font-family:var(--display)}
+.tip .r{display:flex;justify-content:space-between;gap:14px;font-variant-numeric:tabular-nums}
+.tip .k{display:inline-flex;align-items:center;gap:6px;color:var(--muted)}
+.tip .k i{width:8px;height:8px;border-radius:2px;display:inline-block}
+.bars{position:relative;display:grid;gap:2px;max-height:520px;overflow-y:auto;padding-right:4px}
+.brow{display:grid;grid-template-columns:34px minmax(0,1fr) 64px;gap:8px;align-items:center;font-size:.78rem;border-radius:4px;cursor:pointer;padding:1px 2px;background:transparent;border:0;color:inherit;text-align:left;font-family:inherit}
+.brow:hover{background:var(--bg)}
+.brow .st{font-family:var(--mono);color:var(--muted)}
+.brow .trk{position:relative;height:12px}
+.brow .fill{position:absolute;left:0;top:0;bottom:0;background:var(--bar);border-radius:0 4px 4px 0}
+.brow .val{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)}
+.brow.on .fill{background:var(--s1)}
+.brow.on .st,.brow.on .val{color:var(--ink);font-weight:600}
+.brow .usm{position:absolute;top:-2px;bottom:-2px;width:0;border-left:2px solid var(--s2)}
+.stack{display:grid;gap:10px}
+.srow{display:grid;grid-template-columns:90px minmax(0,1fr) 70px;gap:10px;align-items:center;font-size:.8rem}
+.srow .segs{display:flex;gap:2px;height:22px}
+.srow .seg{height:100%;min-width:2px}
+.srow .seg:first-child{border-radius:0}
+.srow .seg:last-child{border-radius:0 4px 4px 0}
+.srow .tot{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.insight{font-size:.85rem;color:var(--ink);background:var(--accent-soft);border-radius:6px;padding:8px 12px}
+details.tbl summary{cursor:pointer;font-family:var(--mono);font-size:.75rem;color:var(--accent)}
+.tbl-wrap{overflow-x:auto;max-height:340px;overflow-y:auto;margin-top:8px}
+table{border-collapse:collapse;width:100%;font-size:.78rem;font-variant-numeric:tabular-nums}
+th,td{padding:4px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{position:sticky;top:0;background:var(--surface);font-weight:600}
+.model{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:16px}
+.model>div{align-content:start}
+.model p{color:var(--muted);font-size:.85rem}
+pre.dax{margin:0;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:12px;overflow-x:auto;font:12px/1.55 var(--mono);color:var(--ink)}
+pre.dax .kw{color:var(--s1)}
+pre.dax .cm{color:var(--muted)}
+.foot{font-size:.78rem;color:var(--muted);display:grid;gap:4px}
+@media (max-width:900px){
+  .grid,.model{grid-template-columns:1fr}
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:480px){
+  .slicer select{min-width:0;width:100%}
+  .slicer{flex:1 1 140px}
+  .srow{grid-template-columns:64px minmax(0,1fr) 58px}
+}
+</style></head><body>
+<div class="wrap">
+  <header class="head">
+    <div class="byline"><span class="eyebrow">Demo report · Public CMS data · Built by Bhargavi Devalla</span><a href="index.html">← Back to portfolio</a></div>
+    <h1>Medicare Advantage Market Tracker</h1>
+    <p class="sub">How enrollment is shifting from Original Medicare to Medicare Advantage and other health plans, by state, 2013 to June 2026. Pick a state in the slicer, on the map or in the ranking.</p>
+  </header>
+
+  <section class="slicers" aria-label="Filters">
+    <div class="slicer"><label for="f-state">State</label><select id="f-state"></select></div>
+    <div class="slicer"><label for="f-year">Map year</label><select id="f-year"></select></div>
+    <button class="reset" id="f-reset" type="button">Reset filters</button>
+  </section>
+
+  <section class="kpis" id="kpis" aria-label="Key figures"></section>
+
+  <section class="grid">
+    <article class="panel">
+      <div class="ph"><h2 id="t-trend">MA and other plan share of beneficiaries</h2><span class="ps">Annual, 2013–2025</span></div>
+      <div class="legend" id="lg-trend"></div>
+      <div class="chart" id="c-trend"></div>
+    </article>
+    <article class="panel">
+      <div class="ph"><h2>The crossover: U.S. monthly enrollment</h2><span class="ps">Jan 2024 – Jun 2026</span></div>
+      <div class="legend"><span><i style="background:var(--s1)"></i>MA &amp; other plans</span><span><i style="background:var(--s3)"></i>Original Medicare</span></div>
+      <div class="chart" id="c-month"></div>
+    </article>
+    <article class="panel">
+      <div class="ph"><h2 id="t-map">MA share by state</h2><span class="legend" id="lg-map"></span></div>
+      <div class="chart" id="c-map"></div>
+      <p class="insight" id="i-map"></p>
+    </article>
+    <article class="panel">
+      <div class="ph"><h2>Change in MA share, 2013 → 2025</h2><span class="ps">Percentage points · <span style="color:var(--s2)">|</span> U.S. change</span></div>
+      <div class="bars" id="c-gain"></div>
+    </article>
+    <article class="panel wide">
+      <details class="tbl"><summary>Show data table</summary><div class="tbl-wrap" id="tbl"></div></details>
+    </article>
+  </section>
+
+  <section class="panel">
+    <div class="ph"><h2>Model and measures</h2><span class="ps">How this report would be built in Power BI</span></div>
+    <div class="model">
+      <div style="display:grid;gap:8px">
+        <p>Star schema with one fact table at state × month grain, loaded from the CMS Medicare Monthly Enrollment API. Dim_Date marks CMS annual rows separately from monthly rows, and Dim_Geography separates national from state rows so U.S. benchmarks never double count.</p>
+        <p><b>Fact_Enrollment</b>: TOT_BENES, MA_AND_OTH_BENES, ORGNL_MDCR_BENES, PRSCRPTN_DRUG_MAPD_BENES, PRSCRPTN_DRUG_PDP_BENES, PRSCRPTN_DRUG_TOT_BENES<br><b>Dim_Geography</b>: StateCode, StateName, GeoLevel<br><b>Dim_Date</b>: Year, Month, PeriodType (Annual / Monthly)</p>
+      </div>
+<pre class="dax"><span class="kw">MA Share %</span> =
+DIVIDE ( SUM ( Fact_Enrollment[MA_AND_OTH_BENES] ),
+         SUM ( Fact_Enrollment[TOT_BENES] ) )
+
+<span class="kw">MA Share % (U.S.)</span> =
+CALCULATE ( [MA Share %],
+    REMOVEFILTERS ( Dim_Geography ),
+    Dim_Geography[GeoLevel] = "National" )
+
+<span class="kw">MA Share Change pp</span> =
+VAR FirstYr = CALCULATE ( [MA Share %], Dim_Date[Year] = 2013 )
+VAR LastYr  = CALCULATE ( [MA Share %], Dim_Date[Year] = 2025 )
+RETURN ( LastYr - FirstYr ) * 100
+
+<span class="kw">MA-PD Share of Part D</span> =
+DIVIDE ( SUM ( Fact_Enrollment[PRSCRPTN_DRUG_MAPD_BENES] ),
+         SUM ( Fact_Enrollment[PRSCRPTN_DRUG_TOT_BENES] ) )</pre>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <p>Source: CMS, <a href="https://data.cms.gov/summary-statistics-on-beneficiary-enrollment/medicare-and-medicaid-reports/medicare-monthly-enrollment" target="_blank" rel="noopener">Medicare Monthly Enrollment</a> (release through June 2026), pulled September 29, 2026. 50 states and DC; territories excluded.</p>
+    <p>"MA &amp; other plans" is CMS's Medicare Advantage and Other Health Plans category, which also includes cost plans and PACE. Annual figures are CMS's annual rows; KPI cards use the June 2026 month.</p>
+  </footer>
+</div>
+<script>
+const DATA={"s":{"US":{"t":[52425.7,54012.7,55495.6,56980.6,58456.7,59989.3,61513.8,62839.3,63891.7,65100.5,66509.9,67995.1,69476.5],"m":[28.3,30,31.5,32.2,33.9,35.5,37.3,39.9,43.1,45.8,48.3,50.1,50.9],"L":[70609057,36106704,34502353,31971705,25273453,11849667,57245158]},"AL":{"t":[921.5,946.2,967.7,988,1007.4,1027.5,1046.6,1062.6,1070.5,1084.3,1101.5,1118.5,1134],"m":[22.8,23.9,25.2,26.5,36.4,39.2,42.1,45.7,50.6,54.3,57.2,59.4,60.4],"L":[1142885,702765,440120,559754,353300,219633,913054]},"AK":{"t":[76.2,79.8,83.7,87.9,91.9,96.2,100.3,104.5,108.1,111.4,114.8,118.1,121.5],"m":[0.7,0.8,0.8,0.8,1.4,1.6,1.7,1.8,2.1,2.4,2.5,2.6,3],"L":[124028,3488,120540,2114,82071,18514,84185]},"AZ":{"t":[1050.1,1094.2,1138,1180.4,1226.7,1271.3,1325.8,1370.1,1400.1,1429.4,1463.9,1500.2,1535.5],"m":[37.3,37.5,38.1,38.2,38.5,39,40.5,42.5,45.2,47.3,49.1,50.3,51],"L":[1560534,802258,758276,752996,511043,248655,1264039]},"AR":{"t":[572.7,585.2,595.6,606.1,616.2,627.6,637.5,646.9,653.3,660.7,669.7,679,687.5],"m":[18.4,19.3,20,20.8,22.1,24.1,26.5,29.8,34.1,37.4,42.9,45,46.3],"L":[692771,326503,366268,304014,250780,129090,554794]},"CA":{"t":[5300.2,5481.6,5653.9,5814.2,5965.4,6124.1,6277.1,6411,6499.1,6625,6774.4,6938.3,7108.8],"m":[37.4,38.9,40.4,41.2,41.8,42.7,43.8,45.3,47.1,48.4,49.8,50.7,51.2],"L":[7243867,3726697,3517170,3588664,2514029,1777831,6102693]},"CO":{"t":[721,754,785.4,815.9,847.7,881,911.5,938.9,961.6,983.7,1009.9,1037.1,1066.2],"m":[35,36.1,36.8,36.8,37.5,37.8,41.8,43.8,46,48.5,50.7,52.1,52.6],"L":[1089448,568437,521011,531697,349892,125213,881589]},"CT":{"t":[608.5,620.1,630.6,641.9,654.7,667.7,680.4,692,702.4,706.3,724.6,743.3,767.4],"m":[23.2,24.1,25.5,26.4,28.2,36.9,41.4,44.8,48.3,51.6,54.3,56.2,57.2],"L":[783973,445012,338961,350874,313744,206029,664618]},"DE":{"t":[167.7,174.3,180.5,186.8,193.6,201.1,208.3,215.7,222.8,229.9,237.8,245.3,253.1],"m":[7.1,7.8,8.2,9.4,11.6,13.9,16.2,19,23.2,27,29.8,31.9,32.7],"L":[258215,84399,173816,70399,139346,32467,209745]},"DC":{"t":[84,86,87.9,89.5,91.1,92.5,94.1,94.1,94.1,94.6,95.2,96.3,97.3],"m":[10.7,11.8,13.1,14.4,15.9,17.8,19.6,22.1,25.3,28.1,31.2,33,34.3],"L":[97782,33704,64078,32434,40549,33552,72983]},"FL":{"t":[3753.5,3893.1,4033,4163.7,4295.2,4412.7,4556.6,4680.1,4803.8,4921.2,5031.2,5136,5242.9],"m":[36,37.8,39.8,40.8,42.5,44.3,46.1,48.5,50.9,52.9,54.7,56.1,56.6],"L":[5334437,3046820,2287617,2861668,1556523,916719,4418191]},"GA":{"t":[1412.9,1470.4,1523.2,1573.3,1624,1676,1727.4,1773.1,1808.9,1850.9,1898.7,1946,1994.4],"m":[26.4,28.9,31.4,33.3,35.3,37.5,39.8,42.9,47.3,50.3,53,54.8,55.4],"L":[2029629,1139149,890480,1055225,575789,372429,1631014]},"HI":{"t":[229.7,237.5,244.9,252,259.4,266.9,274.1,281.2,288.4,294.8,300.8,306.5,312.5],"m":[45.8,46.2,45.7,45.4,45.2,45.5,46,47.3,49.5,51.4,52.8,53.5,53.4],"L":[316532,168761,147771,161682,77619,46970,239301]},"ID":{"t":[260.1,270.7,282,294,306.4,320.2,334.4,349.2,361.6,371.5,382.6,394.6,407.1],"m":[30.3,31.4,32.4,32,31.3,32.3,34.2,37.1,40.3,43.6,46.5,48.6,49.9],"L":[416679,191352,225327,170570,155146,52377,325716]},"IL":{"t":[1984.1,2027.8,2066.7,2108.6,2149.6,2193.6,2233.2,2265.8,2287.3,2320.2,2361.9,2407.8,2452.9],"m":[11.1,17.4,21.1,22,24.1,25.5,27.3,30.2,34.1,37.9,40.6,42.8,43.5],"L":[2487731,1091769,1395962,999573,1057424,383012,2056997]},"IN":{"t":[1094.3,1123.9,1150.5,1178.1,1204.9,1233.7,1260.6,1283.9,1301.3,1322.2,1349.4,1377.6,1404.7],"m":[21.3,22.4,23.6,24.7,26.6,29.4,32,35.9,40.4,43.8,47.1,49.3,50.3],"L":[1426351,728292,698059,637825,558943,219658,1196768]},"IA":{"t":[549,560.8,571.7,584.9,598.2,612.4,625.2,637.4,646.9,658.5,671.9,686.1,699.2],"m":[14.2,14.4,14.8,17.4,18.1,19.8,22.7,25.1,28,31.4,35,37.1,38.1],"L":[709170,266901,442269,226489,370038,84741,596527]},"KS":{"t":[465.9,477.2,487.2,498.5,509.9,523.1,534.9,546.4,555.8,566.2,577.6,590,601.3],"m":[12.7,13.3,13.5,14.5,15.7,17,18.7,21.3,25.4,28.7,31.4,33.2,33],"L":[609353,203812,405541,182825,305252,67761,488077]},"KY":{"t":[826.5,846.1,862.7,879.5,896,912.5,928.9,943.2,952.2,961.4,974.6,988.9,1001.5],"m":[23,24.4,25.9,27.3,28.8,30.8,34,38.6,43.6,48.1,51.5,53.5,54.4],"L":[1010021,559259,450762,476736,360120,178433,836856]},"LA":{"t":[747.5,768.5,788.8,809.7,828.7,849,869.8,884.2,893.6,906,923.1,939.5,955.8],"m":[26.6,28.5,30.2,31.5,33.4,35.5,38.6,42,47,50.4,53.7,55.8,56.6],"L":[966602,558579,408023,521977,289421,219440,811398]},"ME":{"t":[291.1,299.6,306.6,314.3,322.2,331.2,339.4,347.6,356.2,363.7,371.1,378.7,385.7],"m":[18,20.4,22.7,25,28.2,31.6,36,41.7,47.4,51.8,55.1,57.3,58.6],"L":[390974,230041,160933,214515,109645,105512,324160]},"MD":{"t":[876.4,904.9,930.5,958,984,1011.5,1036.9,1058.2,1075.1,1096.7,1122.5,1149.6,1176.4],"m":[8.7,8.8,8.6,9.8,11.3,12.2,12.3,13.1,16.4,19,21.9,24,25.3],"L":[1199172,299774,899398,250713,609919,154898,860632]},"MA":{"t":[1158,1188.8,1216.8,1245.9,1275.5,1304.6,1331.3,1352.8,1374.2,1399.9,1428.8,1457.6,1491.1],"m":[18.5,20.1,20.8,21.2,22.8,23.9,25.1,26.9,29.2,31.4,33.7,35.4,35.9],"L":[1516549,541259,975290,504956,759456,372663,1264412]},"MI":{"t":[1806,1853.2,1894.9,1938.3,1981.5,2024.4,2064.9,2100.4,2130,2162.7,2206.3,2251.6,2293.6],"m":[27.4,30.4,32.9,34.4,36.4,40,41.9,47.8,51.9,55.6,58.8,61.5,62.8],"L":[2324309,1475565,848744,1053983,938280,331060,1992263]},"MN":{"t":[863.4,888.7,913.6,940.5,967.3,996.2,1021.8,1046.4,1068.5,1093.1,1120.8,1151.5,1183],"m":[49.6,51.7,53.7,55.5,57.3,58,45.6,48.4,52.3,55.1,57.7,59.4,60.1],"L":[1206148,688182,517966,571952,432032,135302,1003984]},"MS":{"t":[535.1,547.6,558.7,569.1,580,591,601.6,609.8,614.6,621.9,631.5,641.8,651.5],"m":[12.7,13.5,14.6,15.7,17,18.8,20.3,23.8,29.8,34.9,39.5,42.8,44.1],"L":[657224,297132,360092,275024,248004,160836,523028]},"MO":{"t":[1086.5,1112.9,1136.1,1160.1,1182.9,1204.8,1227.4,1248.4,1263.8,1283.2,1306.7,1331.9,1354.6],"m":[24.7,26.4,28.3,29.9,32,33.9,37.2,40.1,44,47.5,51,53,53.8],"L":[1371496,747474,624022,660060,474600,182683,1134660]},"MT":{"t":[188.3,194.7,201.2,208.3,215.5,223,230.3,237.7,244.1,249.9,256.1,262,267.9],"m":[15.6,17.2,18.2,19.8,20.7,18.5,19.3,20.5,23,25.4,27.6,29.5,29.9],"L":[272554,81217,191337,73314,133824,23976,207138]},"NE":{"t":[298.5,305.7,313.8,321.9,329.5,338,346.1,353.8,360.4,367.9,375.6,383.7,392.5],"m":[12.1,11.8,12,12.4,13.1,14.7,16.8,20.1,24.5,28.5,32,33.7,34],"L":[398932,136297,262635,122243,197863,43941,320106]},"NV":{"t":[413.5,433.5,453.5,472.1,492.3,511.7,531.6,549.4,561.9,573.2,587.3,603.2,617.9],"m":[31.3,32.1,33,33.9,35.2,36.2,37.6,40.1,43.6,46.5,49.1,50.7,51.5],"L":[629551,327593,301958,308424,175247,83334,483671]},"NH":{"t":[246.6,255.9,263.7,272.4,281,290.2,298.7,307.6,316.6,325.7,335.2,345,354.1],"m":[5.8,6.8,7.1,8.4,10.8,13.2,18.6,21.9,25.8,29.3,32.8,34.6,35.5],"L":[361149,112750,248399,101478,176587,30311,278065]},"NJ":{"t":[1433.4,1465.3,1493.4,1523.3,1553.3,1584.7,1615.2,1637.1,1656.8,1687.2,1725.7,1767.5,1809.3],"m":[16.1,15.4,15.3,16.7,21.8,23.4,29.8,32.2,35.1,37.1,38.8,40.3,40.9],"L":[1842581,762684,1079897,555324,930767,231493,1486091]},"NM":{"t":[348.3,360.4,372.4,384.4,396.9,409.8,422,432.5,439.4,446.8,454.7,462.9,470.7],"m":[29.2,30.7,31.6,32.2,33.8,34.6,36.5,39.4,42.5,45.9,48.4,49.7,49.7],"L":[476263,241675,234588,229213,148167,45875,377380]},"NY":{"t":[3213.5,3281.8,3344.2,3410,3482.2,3559.1,3629.6,3672.5,3705.5,3761.5,3832.6,3914.8,3994.4],"m":[33.9,35.8,36.9,37.3,38.9,40.4,41.6,43.6,46.1,48.2,50.2,52.1,52.9],"L":[4054716,2173662,1881054,2009280,1387043,1158947,3396323]},"NC":{"t":[1661.7,1718.3,1770.7,1823,1877.4,1931.9,1985.2,2035.6,2078,2124.3,2175.8,2229.4,2282.7],"m":[20.5,28.5,29.7,30.7,32.1,34.5,37.2,40.5,44.7,48.7,52.5,55.3,56.9],"L":[2322851,1344177,978674,1070213,826367,356528,1896580]},"ND":{"t":[113.6,115.9,118,120.9,124.1,127.7,131,134.3,137.1,140.6,144.2,147.9,151.4],"m":[13.6,14.6,16.6,19.4,18.2,18.3,18.5,19.9,22.8,26.9,31.1,34.3,35.6],"L":[154162,54682,99480,31842,88780,14378,120622]},"OH":{"t":[2057.9,2109.4,2154.8,2202,2249,2295.1,2340,2381.2,2407.8,2441.9,2489,2536.4,2581.5],"m":[37.3,38.5,41,37.4,39,41.5,43.4,46.3,49,51.9,54,55.8,56.7],"L":[2630753,1486653,1144100,1236996,992718,405484,2229714]},"OK":{"t":[651.6,665.7,679.4,692.9,706.3,722.4,738.8,753.5,763.6,775.9,791,806.3,820.4],"m":[16.3,16.5,16.9,17.3,18.1,19.4,21.9,25.2,30.8,34.7,38.1,40.4,41.4],"L":[829592,351749,477843,315035,309474,115942,624509]},"OR":{"t":[699.2,726.9,755,782.3,807.6,836.9,863.6,886.2,901.8,915.6,930.4,945.9,962.1],"m":[42,43.1,43.8,44.2,44.6,45.1,45.6,47.1,49.1,51.4,53.3,54.6,54.3],"L":[972585,523363,449222,498797,304270,168032,803067]},"PA":{"t":[2439.2,2490.4,2534,2581.5,2629.7,2683.4,2732.8,2776.1,2805.4,2845.3,2896,2951.2,3001],"m":[39.1,39.5,39.9,40,41,41.6,42.6,44.5,46.8,49,51.1,52.9,54.2],"L":[3037586,1654830,1382756,1471494,1087455,468248,2558949]},"RI":{"t":[195.6,199.7,203.2,207.3,211.7,216.3,220.5,224.7,228.1,232.9,238,243.3,248.6],"m":[35.1,35.4,35.1,36.1,42.9,44.2,45.5,47.7,50.9,54.2,57.2,59.1,59.7],"L":[252591,150780,101811,144493,66005,44569,210498]},"SC":{"t":[873.5,908,941.6,974,1006.4,1040.4,1075.1,1106,1134,1165.1,1197.3,1231,1263.6],"m":[20.2,22.1,23.2,24.3,25.9,27.6,30,33.3,37.2,40.6,43.3,45.4,46.1],"L":[1285904,600088,685816,537606,487791,172619,1025397]},"SD":{"t":[147.4,151.8,156.1,160.7,165.4,170.9,175.6,180.2,184.6,189.2,193.8,198.3,202.7],"m":[14.6,16.4,18.7,21.2,21,20.8,21.3,23,26.1,29.8,33.4,36,37.4],"L":[206509,73674,132835,44572,112955,20183,157527]},"TN":{"t":[1169.6,1205.2,1235.7,1265.8,1294.9,1325,1356.7,1385.2,1406.2,1428,1455.5,1483.3,1510.3],"m":[30,32.2,34.3,35.5,36.7,38.3,40.1,42.5,45.5,48.1,50.8,52.4,53],"L":[1528522,818739,709783,757039,479949,233090,1236988]},"TX":{"t":[3385.9,3513.1,3634.7,3757.3,3883.6,4018.9,4158.8,4286,4386.8,4507.6,4639.2,4773.9,4914],"m":[27.2,29.2,31.6,33.1,35.1,38.3,40,42.7,46.5,49.1,51.9,53.4,54],"L":[5017127,2749053,2268074,2292192,1725758,668800,4017950]},"UT":{"t":[320.1,332.9,345.9,358.8,371.9,386.3,401,415,427.6,439.3,452,465.9,480],"m":[33,33.2,33.7,34.4,35.3,36.2,37.4,40,43.3,46.2,49.4,51.8,53.6],"L":[490235,269226,221009,251606,140879,38927,392485]},"VT":{"t":[123.9,127.9,131.3,135.3,139.2,143.5,147.2,151.3,155.1,158.6,162,165.2,168.1],"m":[7.3,7.2,7.4,7.7,9.2,10.4,12.1,14.4,19.8,27.1,30.6,32.5,30.8],"L":[170636,21590,149046,15606,118943,31609,134549]},"VA":{"t":[1269.6,1311.3,1350.3,1389.1,1427.7,1470,1509.5,1545.6,1575.5,1608.5,1647.1,1688.6,1728.5],"m":[15.1,16.5,17.9,18.4,19.5,20,22.1,25.1,29.4,33.1,36.1,38.1,39],"L":[1756307,694265,1062042,616556,690823,200923,1307379]},"WA":{"t":[1101,1146,1191.4,1235.1,1277.4,1320.5,1362,1398.9,1431.9,1459.1,1490.7,1524.2,1558.5],"m":[28.6,29.6,29.9,30,30.7,32.2,34,36.5,39.6,42.3,45.3,48.7,49.2],"L":[1583566,787414,796152,751088,501361,235838,1252449]},"WV":{"t":[403.9,410.7,416.1,421.9,427.9,433.9,438.6,442.7,444.3,445,448.7,453.3,456.4],"m":[23.2,25.2,25.7,26.4,28.9,31.2,33.9,37.9,42.8,46.8,50.8,53.7,55.3],"L":[457400,259090,198310,176017,181837,82457,357854]},"WI":{"t":[994,1022.6,1049.9,1079.8,1110.3,1142.4,1171.9,1200.5,1225.5,1253.3,1283.4,1316.1,1348.4],"m":[33.6,35.3,37.8,38.8,39.9,41.3,43.6,46.2,49.2,52.1,54.8,56.9,57.7],"L":[1373621,788399,585222,643368,463053,175792,1106421]},"WY":{"t":[88.8,91.8,94.9,98.3,101.9,106.1,110,113.8,117.4,120.6,123.9,127.4,130.6],"m":[3.7,3.5,3.6,3.5,3.9,4.1,4.5,4.9,5.9,8.5,13.5,17.9,19.7],"L":[133246,20520,112726,15963,79677,11782,95640]}},"mo":[["2024-Jan",33597826,33774596],["2024-Feb",33718415,33716564],["2024-Mar",33806588,33749099],["2024-Apr",33899701,33758835],["2024-May",33992284,33782847],["2024-Jun",34070729,33827372],["2024-Jul",34154944,33886018],["2024-Aug",34211808,33969178],["2024-Sep",34311657,34017393],["2024-Oct",34390551,34075388],["2024-Nov",34409848,34154744],["2024-Dec",34410877,34254133],["2025-Jan",34859308,34008403],["2025-Feb",35038651,33890283],["2025-Mar",35107817,33927034],["2025-Apr",35182359,33940299],["2025-May",35274687,33962965],["2025-Jun",35344600,34012064],["2025-Jul",35428611,34073820],["2025-Aug",35483231,34170743],["2025-Sep",35553189,34259155],["2025-Oct",35603449,34355916],["2025-Nov",35621253,34443779],["2025-Dec",35613901,34561950],["2026-Jan",35705175,34585371],["2026-Feb",35867745,34451455],["2026-Mar",35922995,34478861],["2026-Apr",36003398,34476211],["2026-May",36059790,34487185],["2026-Jun",36106704,34502353]]};
+const NAMES={US:'United States',AL:'Alabama',AK:'Alaska',AZ:'Arizona',AR:'Arkansas',CA:'California',CO:'Colorado',CT:'Connecticut',DE:'Delaware',DC:'District of Columbia',FL:'Florida',GA:'Georgia',HI:'Hawaii',ID:'Idaho',IL:'Illinois',IN:'Indiana',IA:'Iowa',KS:'Kansas',KY:'Kentucky',LA:'Louisiana',ME:'Maine',MD:'Maryland',MA:'Massachusetts',MI:'Michigan',MN:'Minnesota',MS:'Mississippi',MO:'Missouri',MT:'Montana',NE:'Nebraska',NV:'Nevada',NH:'New Hampshire',NJ:'New Jersey',NM:'New Mexico',NY:'New York',NC:'North Carolina',ND:'North Dakota',OH:'Ohio',OK:'Oklahoma',OR:'Oregon',PA:'Pennsylvania',RI:'Rhode Island',SC:'South Carolina',SD:'South Dakota',TN:'Tennessee',TX:'Texas',UT:'Utah',VT:'Vermont',VA:'Virginia',WA:'Washington',WV:'West Virginia',WI:'Wisconsin',WY:'Wyoming'};
+const TILES={AK:[0,0],ME:[11,0],VT:[10,1],NH:[11,1],WA:[1,2],ID:[2,2],MT:[3,2],ND:[4,2],MN:[5,2],IL:[6,2],WI:[7,2],MI:[8,2],NY:[9,2],RI:[10,2],MA:[11,2],OR:[1,3],NV:[2,3],WY:[3,3],SD:[4,3],IA:[5,3],IN:[6,3],OH:[7,3],PA:[8,3],NJ:[9,3],CT:[10,3],CA:[1,4],UT:[2,4],CO:[3,4],NE:[4,4],MO:[5,4],KY:[6,4],WV:[7,4],VA:[8,4],MD:[9,4],DE:[10,4],AZ:[2,5],NM:[3,5],KS:[4,5],AR:[5,5],TN:[6,5],NC:[7,5],SC:[8,5],DC:[9,5],OK:[4,6],LA:[5,6],MS:[6,6],AL:[7,6],GA:[8,6],HI:[0,7],TX:[4,7],FL:[9,7]};
+const STATES=Object.keys(NAMES).filter(k=>k!=='US').sort((a,b)=>NAMES[a].localeCompare(NAMES[b]));
+const $=s=>document.querySelector(s);
+const cssv=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const NS='http://www.w3.org/2000/svg';
+function el(tag,attrs,parent){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e}
+function txt(parent,x,y,s,attrs={}){const t=el('text',Object.assign({x,y},attrs),parent);t.textContent=s;return t}
+const tip=document.createElement('div');tip.className='tip';tip.hidden=true;document.body.appendChild(tip);
+function showTip(evt,html){tip.innerHTML=html;tip.hidden=false;const p=14,r=tip.getBoundingClientRect();let x=evt.clientX+p,y=evt.clientY+p;if(x+r.width>innerWidth-8)x=evt.clientX-r.width-p;if(y+r.height>innerHeight-8)y=evt.clientY-r.height-p;tip.style.left=Math.max(8,x)+'px';tip.style.top=Math.max(8,y)+'px'}
+function hideTip(){tip.hidden=true}
+const tipRow=(color,k,v)=>`<div class="r"><span class="k">${color?`<i style="background:${color}"></i>`:''}${k}</span><span>${v}</span></div>`;
+function niceTicks(min,max,n=4){const span=(max-min)||1,s0=span/n,mag=10**Math.floor(Math.log10(s0)),e=s0/mag;const step=(e>=7.5?10:e>=3.5?5:e>=1.5?2:1)*mag;const lo=Math.floor(min/step)*step,hi=Math.ceil(max/step)*step;const t=[];for(let v=lo;v<=hi+step/2;v+=step)t.push(+v.toFixed(8));return t}
+function hex2rgb(h){h=h.replace('#','');if(h.length===3)h=h.split('').map(c=>c+c).join('');return[0,2,4].map(i=>parseInt(h.slice(i,i+2),16))}
+function lerpColor(a,b,t){const A=hex2rgb(a),B=hex2rgb(b);return'rgb('+A.map((v,i)=>Math.round(v+(B[i]-v)*t)).join(',')+')'}
+function lum(rgbStr){const [r,g,b]=rgbStr.match(/\d+/g).map(Number).map(v=>{v/=255;return v<=.03928?v/12.92:((v+.055)/1.055)**2.4});return .2126*r+.7152*g+.0722*b}
+function fillSelect(sel,opts,val){sel.innerHTML=opts.map(([v,l])=>`<option value="${v}">${l}</option>`).join('');sel.value=val}
+function stateOptions(){return[['US','All states (U.S.)'],...STATES.map(k=>[k,NAMES[k]])]}
+
+/* Line chart with crosshair + tooltip. series: [{label,color,v:[],w}] */
+function lineChart(box,{x,series,fmt,fmtAxis,height=250,yZero=false,annot=[]}){
+  box.innerHTML='';const W=Math.max(300,box.clientWidth),H=height,m={t:14,r:62,b:26,l:50};
+  const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,role:'img','aria-label':series.map(s=>s.label).join(' vs ')},box);
+  const vals=series.flatMap(s=>s.v.filter(v=>v!=null));let mn=Math.min(...vals),mx=Math.max(...vals);const pad=(mx-mn)*.1||1;
+  const ticks=niceTicks(yZero?0:mn-pad,mx+pad,4),y0=ticks[0],y1=ticks[ticks.length-1];
+  const X=i=>m.l+(W-m.l-m.r)*i/(x.length-1),Y=v=>H-m.b-(H-m.t-m.b)*(v-y0)/(y1-y0);
+  ticks.forEach(t=>{el('line',{x1:m.l,x2:W-m.r,y1:Y(t),y2:Y(t),class:t===y0?'base':'grid'},svg);txt(svg,m.l-8,Y(t)+4,(fmtAxis||fmt)(t),{class:'ax','text-anchor':'end'})});
+  const every=Math.max(1,Math.ceil(x.length/Math.max(2,Math.floor((W-m.l-m.r)/58))));
+  x.forEach((l,i)=>{if(i%every===0)txt(svg,X(i),H-6,l,{class:'ax','text-anchor':'middle'})});
+  annot.forEach(a=>{el('line',{x1:X(a.i),x2:X(a.i),y1:m.t,y2:H-m.b,class:'ann'},svg);txt(svg,X(a.i)+5,m.t+10,a.text,{class:'ax'})});
+  const ends=[];
+  series.forEach(s=>{let d='';s.v.forEach((v,i)=>{if(v==null)return;d+=(d&&s.v[i-1]!=null?'L':'M')+X(i).toFixed(1)+','+Y(v).toFixed(1)});
+    el('path',{d,class:'ln',stroke:s.color,'stroke-width':s.w||2},svg);
+    let li=s.v.length-1;while(li>0&&s.v[li]==null)li--;
+    el('circle',{cx:X(li),cy:Y(s.v[li]),r:4,fill:s.color,class:'ring'},svg);ends.push({y:Y(s.v[li])+4,v:s.v[li],x:X(li)+8})});
+  ends.sort((a,b)=>a.y-b.y);for(let k=1;k<ends.length;k++)if(ends[k].y-ends[k-1].y<13)ends[k].y=ends[k-1].y+13;
+  ends.forEach(e=>txt(svg,e.x,e.y,fmt(e.v),{class:'lbl'}));
+  const hov=el('g',{},svg);
+  const hit=el('rect',{x:m.l,y:m.t,width:W-m.l-m.r,height:H-m.t-m.b,fill:'transparent'},svg);
+  const move=ev=>{const r=svg.getBoundingClientRect(),px=(ev.clientX-r.left)*W/r.width;const i=Math.max(0,Math.min(x.length-1,Math.round((px-m.l)/(W-m.l-m.r)*(x.length-1))));
+    hov.innerHTML='';el('line',{x1:X(i),x2:X(i),y1:m.t,y2:H-m.b,class:'xh'},hov);
+    series.forEach(s=>{if(s.v[i]!=null)el('circle',{cx:X(i),cy:Y(s.v[i]),r:4.5,fill:s.color,class:'ring'},hov)});
+    showTip(ev,`<b>${x[i]}</b>`+series.map(s=>tipRow(s.color,s.label,s.v[i]==null?'–':fmt(s.v[i]))).join(''))};
+  hit.addEventListener('pointermove',move);hit.addEventListener('pointerleave',()=>{hov.innerHTML='';hideTip()});
+}
+
+/* Ranked horizontal bars (HTML). items: [{k,label,v}] */
+function barList(box,{items,fmt,sel,ref,refLabel,onPick}){
+  const max=Math.max(...items.map(d=>d.v),ref||0)*1.04;
+  box.innerHTML='';
+  items.forEach(d=>{const b=document.createElement('button');b.type='button';b.className='brow'+(d.k===sel?' on':'');
+    b.innerHTML=`<span class="st">${d.k}</span><span class="trk"><span class="fill" style="width:${(d.v/max*100).toFixed(2)}%"></span>${ref!=null?`<span class="usm" style="left:${(ref/max*100).toFixed(2)}%"></span>`:''}</span><span class="val">${fmt(d.v)}</span>`;
+    b.setAttribute('aria-label',`${d.label}: ${fmt(d.v)}`);
+    b.addEventListener('pointermove',ev=>showTip(ev,`<b>${d.label}</b>`+tipRow(cssv('--s1'),'Value',fmt(d.v))+(ref!=null?tipRow(cssv('--s2'),refLabel,fmt(ref)):'')));
+    b.addEventListener('pointerleave',hideTip);b.addEventListener('click',()=>onPick(d.k));box.appendChild(b)});
+  const on=box.querySelector('.on');if(on)box.scrollTop=Math.max(0,on.offsetTop-box.clientHeight/2+on.offsetHeight/2);
+}
+
+/* Tile map. values: {ST:number} */
+function tileMap(box,{values,fmt,sel,onPick,label}){
+  box.innerHTML='';const S=46,G=4,W=12*(S+G),H=8*(S+G);
+  const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,role:'img','aria-label':label},box);
+  const v=Object.values(values),mn=Math.min(...v),mx=Math.max(...v),lo=cssv('--seq-lo'),hi=cssv('--seq-hi');
+  for(const st in TILES){const [c,r]=TILES[st],x=c*(S+G),y=r*(S+G),t=(values[st]-mn)/((mx-mn)||1),col=lerpColor(lo,hi,t);
+    const g=el('g',{tabindex:0,role:'button','aria-label':`${NAMES[st]}: ${fmt(values[st])}`,style:'cursor:pointer'},svg);
+    el('rect',{x,y,width:S,height:S,rx:5,fill:col,stroke:st===sel?cssv('--s2'):'none','stroke-width':st===sel?3:0},g);
+    const dark=lum(col)<.28;
+    txt(g,x+S/2,y+19,st,{'text-anchor':'middle',style:`fill:${dark?'#fff':'#14201D'};font-weight:600;font-size:12px`});
+    txt(g,x+S/2,y+35,fmt(values[st]),{'text-anchor':'middle',style:`fill:${dark?'#fff':'#14201D'};font-size:10.5px`});
+    g.addEventListener('pointermove',ev=>showTip(ev,`<b>${NAMES[st]}</b>`+tipRow(null,label,fmt(values[st]))));
+    g.addEventListener('pointerleave',hideTip);g.addEventListener('click',()=>onPick(st));
+    g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();onPick(st)}})}
+  return{mn,mx,lo,hi};
+}
+function rampLegend(box,{mn,mx,lo,hi},fmt){box.innerHTML=`<span>${fmt(mn)}</span><span style="flex:0 0 140px;height:10px;border-radius:2px;background:linear-gradient(90deg,${lo},${hi})"></span><span>${fmt(mx)}</span>`}
+
+/* Scatter. points: [{k,x,y}] */
+function scatter(box,{points,fmtX,fmtY,xLabel,yLabel,sel,onPick,height=300}){
+  box.innerHTML='';const W=Math.max(300,box.clientWidth),H=height,m={t:14,r:16,b:40,l:54};
+  const svg=el('svg',{viewBox:`0 0 ${W} ${H}`,role:'img','aria-label':`${yLabel} by ${xLabel}`},box);
+  const xs=points.map(p=>p.x),ys=points.map(p=>p.y);
+  const xt=niceTicks(Math.min(...xs),Math.max(...xs),W<520?3:5),yt=niceTicks(Math.min(...ys),Math.max(...ys),4);
+  const X=v=>m.l+(W-m.l-m.r)*(v-xt[0])/(xt[xt.length-1]-xt[0]),Y=v=>H-m.b-(H-m.t-m.b)*(v-yt[0])/(yt[yt.length-1]-yt[0]);
+  yt.forEach(t=>{el('line',{x1:m.l,x2:W-m.r,y1:Y(t),y2:Y(t),class:t===yt[0]?'base':'grid'},svg);txt(svg,m.l-8,Y(t)+4,fmtY(t),{class:'ax','text-anchor':'end'})});
+  xt.forEach(t=>txt(svg,X(t),H-m.b+16,fmtX(t),{class:'ax','text-anchor':'middle'}));
+  txt(svg,(m.l+W-m.r)/2,H-4,xLabel,{'text-anchor':'middle'});
+  const ordered=[...points].sort((a,b)=>(a.k===sel)-(b.k===sel)||(a.k==='US')-(b.k==='US'));
+  ordered.forEach(p=>{const on=p.k===sel,us=p.k==='US';const g=el('g',{style:'cursor:pointer'},svg);
+    el('circle',{cx:X(p.x),cy:Y(p.y),r:on||us?6:4.5,fill:on?cssv('--s1'):us?cssv('--s2'):cssv('--ref'),class:'ring','fill-opacity':on||us?1:.85},g);
+    if(on||us)txt(g,X(p.x)+9,Y(p.y)+4,p.k,{class:'lbl'});
+    el('circle',{cx:X(p.x),cy:Y(p.y),r:10,fill:'transparent'},g);
+    g.addEventListener('pointermove',ev=>showTip(ev,`<b>${NAMES[p.k]}</b>`+tipRow(null,xLabel,fmtX(p.x))+tipRow(null,yLabel,fmtY(p.y))));
+    g.addEventListener('pointerleave',hideTip);if(!us)g.addEventListener('click',()=>onPick(p.k))});
+}
+function pearson(a,b){const n=a.length,ma=a.reduce((s,v)=>s+v,0)/n,mb=b.reduce((s,v)=>s+v,0)/n;let num=0,da=0,db=0;for(let i=0;i<n;i++){num+=(a[i]-ma)*(b[i]-mb);da+=(a[i]-ma)**2;db+=(b[i]-mb)**2}return num/Math.sqrt(da*db)}
+function onResize(fn){let t;addEventListener('resize',()=>{clearTimeout(t);t=setTimeout(fn,150)})}
+const fmtPct=v=>v.toFixed(1)+'%';
+const fmtUSD=v=>'$'+Math.round(v).toLocaleString('en-US');
+const fmtN=v=>Math.round(v).toLocaleString('en-US');
+function fmtBig(v){return v>=1e6?(v/1e6).toFixed(v>=1e7?1:2)+'M':v>=1e3?Math.round(v/1e3)+'K':String(v)}
+
+const YEARS=Array.from({length:13},(_,i)=>2013+i);
+const S=DATA.s;
+const st={geo:'US',year:2025};
+fillSelect($('#f-state'),stateOptions(),st.geo);
+fillSelect($('#f-year'),YEARS.slice().reverse().map(y=>[y,y]),st.year);
+$('#f-state').addEventListener('change',e=>{st.geo=e.target.value;render()});
+$('#f-year').addEventListener('change',e=>{st.year=+e.target.value;render()});
+$('#f-reset').addEventListener('click',()=>{st.geo='US';st.year=2025;$('#f-state').value='US';$('#f-year').value=2025;render()});
+function pick(k){st.geo=st.geo===k?'US':k;$('#f-state').value=st.geo;render()}
+
+function kpis(){
+  const d=S[st.geo],us=S.US,L=d.L,name=st.geo==='US'?'U.S.':NAMES[st.geo];
+  const share=L[1]/L[0]*100,usShare=us.L[1]/us.L[0]*100,chg=d.m[12]-d.m[0];
+  const cards=[
+    ['Medicare beneficiaries, Jun 2026',fmtBig(L[0]),st.geo==='US'?`+${((d.t[12]/d.t[0]-1)*100).toFixed(0)}% since 2013`:`${(L[0]/us.L[0]*100).toFixed(1)}% of U.S. total`],
+    ['In MA & other plans, Jun 2026',fmtPct(share),st.geo==='US'?`Original Medicare ${fmtPct(L[2]/L[0]*100)}`:`U.S. ${fmtPct(usShare)} · ${share>=usShare?'+':''}${(share-usShare).toFixed(1)} pp`],
+    ['Change in MA share, 2013 → 2025',`${chg>=0?'+':''}${chg.toFixed(1)} pp`,`${fmtPct(d.m[0])} → ${fmtPct(d.m[12])}`],
+    ['Part D enrollees in MA-PD plans',fmtPct(L[3]/L[6]*100),`Stand-alone PDP ${fmtPct(L[4]/L[6]*100)}`]];
+  $('#kpis').innerHTML=cards.map(([l,v,dd])=>`<div class="kpi"><span class="l">${l}</span><span class="v">${v}</span><span class="d">${dd}</span></div>`).join('');
+  $('#kpis').setAttribute('aria-label',`Key figures for ${name}`);
+}
+function trend(){
+  const series=[];
+  if(st.geo!=='US')series.push({label:NAMES[st.geo],color:cssv('--s1'),v:S[st.geo].m});
+  series.push({label:'United States',color:cssv(st.geo==='US'?'--s1':'--s2'),v:S.US.m});
+  $('#lg-trend').innerHTML=series.map(s=>`<span><i style="background:${s.color}"></i>${s.label}</span>`).join('');
+  lineChart($('#c-trend'),{x:YEARS.map(String),series,fmt:fmtPct,fmtAxis:v=>v+'%',yZero:true,height:240});
+}
+function monthly(){
+  const mo=DATA.mo;
+  lineChart($('#c-month'),{x:mo.map(r=>r[0].replace('-',' ').replace(/^(\d{4}) (\w{3})$/,'$2 ’$1').replace('’20','’')),
+    series:[{label:'MA & other plans',color:cssv('--s1'),v:mo.map(r=>r[1])},{label:'Original Medicare',color:cssv('--s3'),v:mo.map(r=>r[2])}],
+    fmt:v=>(v/1e6).toFixed(2)+'M',fmtAxis:v=>(v/1e6).toFixed(1)+'M',height:240,annot:[{i:1,text:'Feb ’24: MA pulls ahead'}]});
+}
+function map(){
+  const yi=st.year-2013,vals={};for(const k of STATES)vals[k]=S[k].m[yi];
+  $('#t-map').textContent=`MA share by state, ${st.year}`;
+  const r=tileMap($('#c-map'),{values:vals,fmt:v=>Math.round(v)+'%',sel:st.geo,onPick:pick,label:`MA share ${st.year}`});
+  rampLegend($('#lg-map'),r,v=>Math.round(v)+'%');
+  const sorted=STATES.slice().sort((a,b)=>vals[b]-vals[a]);
+  $('#i-map').textContent=`In ${st.year}, ${NAMES[sorted[0]]} had the highest MA share (${fmtPct(vals[sorted[0]])}) and ${NAMES[sorted.at(-1)]} the lowest (${fmtPct(vals[sorted.at(-1)])}). ${STATES.filter(k=>vals[k]>=50).length} of 51 were at 50% or more.`;
+}
+function gains(){
+  const items=STATES.map(k=>({k,label:NAMES[k],v:+(S[k].m[12]-S[k].m[0]).toFixed(1)})).sort((a,b)=>b.v-a.v);
+  barList($('#c-gain'),{items,fmt:v=>'+'+v.toFixed(1),sel:st.geo,ref:+(S.US.m[12]-S.US.m[0]).toFixed(1),refLabel:'U.S. change',onPick:pick});
+}
+function table(){
+  const rows=STATES.map(k=>{const d=S[k];return`<tr><td>${NAMES[k]}</td><td>${fmtPct(d.m[0])}</td><td>${fmtPct(d.m[6])}</td><td>${fmtPct(d.m[12])}</td><td>${(d.m[12]-d.m[0]).toFixed(1)}</td><td>${fmtN(d.L[0])}</td><td>${fmtPct(d.L[1]/d.L[0]*100)}</td></tr>`}).join('');
+  const u=S.US;
+  $('#tbl').innerHTML=`<table><thead><tr><th>State</th><th>MA share 2013</th><th>2019</th><th>2025</th><th>Change (pp)</th><th>Beneficiaries Jun 2026</th><th>MA share Jun 2026</th></tr></thead><tbody><tr><td><b>United States</b></td><td>${fmtPct(u.m[0])}</td><td>${fmtPct(u.m[6])}</td><td>${fmtPct(u.m[12])}</td><td>${(u.m[12]-u.m[0]).toFixed(1)}</td><td>${fmtN(u.L[0])}</td><td>${fmtPct(u.L[1]/u.L[0]*100)}</td></tr>${rows}</tbody></table>`;
+}
+function render(){kpis();trend();monthly();map();gains()}
+table();render();onResize(()=>{trend();monthly()});
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',render);
+new MutationObserver(render).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+</script>
+</body></html>
