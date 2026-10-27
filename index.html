@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Bhargavi Devalla, Senior BI Developer: Power BI and Microsoft Fabric for healthcare and insurance.">
+<title>Bhargavi Devalla</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a report canvas. Header card, KPI strip, then a two-track body (experience + a star-schema "model view" of skills). */
+:root{
+  --bg:#F3F5F2; --surface:#FFFFFF; --ink:#14201D; --muted:#56635F; --line:#D6DDD8;
+  --accent:#0E6E5C; --accent-soft:#E1EFEA; --signal:#C9831A; --signal-soft:#F7EBD6;
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body:"IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1614; --surface:#16201D; --ink:#E6ECE9; --muted:#9AA8A3; --line:#2A3632;
+  --accent:#4FC2A8; --accent-soft:#17332C; --signal:#E8A844; --signal-soft:#3A2D16; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1614; --surface:#16201D; --ink:#E6ECE9; --muted:#9AA8A3; --line:#2A3632;
+  --accent:#4FC2A8; --accent-soft:#17332C; --signal:#E8A844; --signal-soft:#3A2D16; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6;padding-inline:20px;padding-block:0}
+.wrap{max-width:1080px;margin:0 auto;padding-block:40px 72px;display:grid;gap:56px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.1}
+h2{font-size:clamp(1.5rem,3vw,2rem);font-weight:700}
+h3{font-size:1.2rem;font-weight:700}
+p{margin:0}
+a{color:var(--accent)}
+a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
+.eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.section-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:24px}
+
+/* Hero */
+.hero{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:40px;align-items:end}
+.hero h1{font-size:clamp(2.6rem,7vw,4.6rem);font-weight:800;letter-spacing:-.02em}
+.hero .role{font-family:var(--display);font-size:clamp(1.15rem,2.4vw,1.5rem);font-weight:500;color:var(--accent);margin-top:10px}
+.hero .summary{margin-top:20px;max-width:62ch;color:var(--muted);font-size:1.05rem}
+.status{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:.8rem;background:var(--accent-soft);color:var(--accent);padding:6px 12px;border-radius:999px;margin-bottom:20px}
+.status i{width:8px;height:8px;border-radius:50%;background:var(--accent);display:block}
+.contact{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px;display:grid;gap:14px}
+.contact-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center}
+.contact-row .k{font-family:var(--mono);font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;width:64px}
+.contact-row .v{font-size:.95rem;overflow-wrap:anywhere;user-select:all}
+.copy{font:500 .75rem var(--mono);background:transparent;border:1px solid var(--line);color:var(--ink);padding:4px 8px;border-radius:6px;cursor:pointer}
+.copy:hover{border-color:var(--accent);color:var(--accent)}
+.badge{display:flex;gap:12px;align-items:center;border-top:1px dashed var(--line);padding-top:14px}
+.badge svg{flex:none}
+.badge b{display:block;font-size:.9rem}
+.badge span{font-size:.8rem;color:var(--muted)}
+
+/* KPI strip */
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.kpi{background:var(--surface);padding:22px 20px;display:grid;gap:6px;align-content:start}
+.kpi .n{font-family:var(--display);font-weight:800;font-size:clamp(2rem,4vw,2.8rem);line-height:1;font-variant-numeric:tabular-nums}
+.kpi .n small{font-size:.5em;color:var(--signal);margin-left:2px}
+.kpi .l{font-size:.9rem;color:var(--muted)}
+.kpi .src{font-family:var(--mono);font-size:.7rem;color:var(--muted);opacity:.85}
+
+/* Perf chart */
+.perf{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:40px;align-items:center}
+.perf p{color:var(--muted);max-width:52ch;margin-top:12px}
+.bars{display:grid;gap:16px}
+.bar{display:grid;grid-template-columns:minmax(0,170px) minmax(0,1fr) 48px;gap:12px;align-items:center;font-size:.88rem}
+.track{height:14px;background:var(--accent-soft);border-radius:3px;position:relative}
+.fill{height:100%;background:var(--signal);border-radius:3px}
+.bar .pct{font-family:var(--mono);text-align:right;font-variant-numeric:tabular-nums}
+.axis{display:grid;grid-template-columns:minmax(0,170px) minmax(0,1fr) 48px;gap:12px;font-family:var(--mono);font-size:.68rem;color:var(--muted)}
+.axis div:nth-child(2){display:flex;justify-content:space-between}
+
+/* Experience */
+.jobs{display:grid;gap:0}
+.job{display:grid;grid-template-columns:200px minmax(0,1fr);gap:32px;padding-block:28px;border-top:1px solid var(--line)}
+.job:first-child{border-top:0;padding-top:0}
+.job .when{font-family:var(--mono);font-size:.8rem;color:var(--muted);display:grid;gap:4px;align-content:start}
+.job .when b{font-family:var(--display);font-size:1.15rem;color:var(--ink);font-weight:700}
+.job .client{font-size:.9rem;color:var(--muted);margin-top:4px}
+.job ul{margin:14px 0 0;padding-left:18px;display:grid;gap:8px;max-width:70ch}
+.job li::marker{color:var(--accent)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.chip{font-family:var(--mono);font-size:.74rem;padding:4px 10px;border-radius:999px;background:var(--signal-soft);color:var(--ink);border:1px solid transparent}
+.chip.t{background:transparent;border-color:var(--line);color:var(--muted)}
+
+/* Case studies */
+.cases{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.case{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:22px;display:grid;gap:12px;align-content:start}
+.case .tag{font-family:var(--mono);font-size:.72rem;color:var(--accent)}
+.case p{font-size:.93rem;color:var(--muted)}
+.case .result{font-family:var(--display);font-weight:700;font-size:1.05rem;border-top:1px dashed var(--line);padding-top:12px}
+
+/* Skills model view */
+.model{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px}
+.model svg{display:block;min-width:760px;width:100%;height:auto}
+.model .tbl{fill:var(--surface);stroke:var(--line)}
+.model .hdr{fill:var(--accent-soft)}
+.model .fact .hdr{fill:var(--signal-soft)}
+.model .fact .tbl{stroke:var(--signal)}
+.model text{fill:var(--ink);font-family:var(--mono);font-size:11.5px}
+.model .tn{font-weight:500;font-size:12.5px}
+.model .rel{stroke:var(--muted);stroke-width:1.2;fill:none}
+.model .card{fill:var(--muted);font-size:10px}
+.note{font-size:.85rem;color:var(--muted);margin-top:10px}
+
+/* Nav */
+.nav{display:flex;flex-wrap:wrap;gap:6px 20px;font-family:var(--mono);font-size:.78rem;border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:-24px}
+.nav a{color:var(--muted);text-decoration:none}
+.nav a:hover{color:var(--accent)}
+.nav .me{color:var(--ink);font-weight:500;margin-right:auto}
+
+/* Looking for */
+.seeking{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px;background:var(--accent-soft);border-radius:10px;padding:24px}
+.seeking h3{font-size:.8rem;font-family:var(--mono);font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+.seeking ul{list-style:none;margin:0;padding:0;display:grid;gap:4px;font-size:.95rem}
+
+/* Case studies (deep) */
+.studies{display:grid;gap:48px}
+.study{display:grid;gap:20px}
+.study-head{display:grid;gap:6px}
+.study-head .tag{font-family:var(--mono);font-size:.75rem;color:var(--accent)}
+.study-head h3{font-size:clamp(1.3rem,2.6vw,1.65rem)}
+.study-body{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px}
+.study-body h4{font-family:var(--mono);font-size:.72rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+.study-body p,.study-body li{font-size:.94rem}
+.study-body ul{margin:0;padding-left:18px;display:grid;gap:6px}
+.study-body li::marker{color:var(--accent)}
+.outcomes{display:grid;gap:10px}
+.outcome{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:baseline}
+.outcome b{font-family:var(--display);font-size:1.35rem;color:var(--signal);font-variant-numeric:tabular-nums;white-space:nowrap}
+.outcome span{font-size:.9rem;color:var(--muted)}
+.diagram{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px}
+.diagram svg{display:block;min-width:820px;width:100%;height:auto}
+.diagram .box{fill:var(--surface);stroke:var(--line);stroke-width:1.2}
+.diagram .box.hi{fill:var(--accent-soft);stroke:var(--accent)}
+.diagram .box.sig{fill:var(--signal-soft);stroke:var(--signal)}
+.diagram .grp{fill:none;stroke:var(--muted);stroke-dasharray:4 4}
+.diagram text{fill:var(--ink);font-family:var(--mono);font-size:12px}
+.diagram .h{font-weight:500;font-size:12.5px}
+.diagram .lbl{fill:var(--muted);font-size:10.5px;letter-spacing:.06em}
+.diagram .arr{stroke:var(--muted);stroke-width:1.4;fill:none;marker-end:url(#ah)}
+.diagram .arr2{stroke:var(--muted);stroke-width:1.4;fill:none;marker-end:url(#ah2)}
+.diagram marker path{fill:var(--muted)}
+.diagram-cap{font-size:.82rem;color:var(--muted);margin-top:8px}
+
+/* Leadership */
+.lead{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.lead article{background:var(--surface);padding:24px;display:grid;gap:10px;align-content:start}
+.lead p{color:var(--muted);font-size:.94rem;max-width:60ch}
+.lead .proof{font-family:var(--mono);font-size:.74rem;color:var(--accent)}
+
+.resume-btn{display:flex;justify-content:center;align-items:center;gap:8px;background:var(--accent);color:var(--surface);font:600 .92rem var(--body);text-decoration:none;padding:11px 16px;border-radius:8px}
+.resume-btn:hover{filter:brightness(1.1)}
+/* Demo reports */
+.demos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.demo{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:22px;display:grid;gap:12px;align-content:start;text-decoration:none;color:var(--ink);transition:border-color .15s}
+.demo:hover{border-color:var(--accent)}
+.demo .shot{display:block;width:100%;height:auto;aspect-ratio:930/570;border-radius:6px;border:1px solid var(--line)}
+.demo .tag{font-family:var(--mono);font-size:.72rem;color:var(--accent)}
+.demo p{font-size:.93rem;color:var(--muted)}
+.demo .stat{display:flex;gap:10px;align-items:baseline;border-top:1px dashed var(--line);padding-top:12px}
+.demo .stat b{font-family:var(--display);font-size:1.5rem;color:var(--signal);white-space:nowrap}
+.demo .stat span{font-size:.88rem;color:var(--muted)}
+.demo .open{font-family:var(--mono);font-size:.8rem;color:var(--accent)}
+@media (max-width:860px){.demos{grid-template-columns:1fr}}
+.foot{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.foot .box{border-top:2px solid var(--ink);padding-top:14px;display:grid;gap:6px}
+.foot .box p{color:var(--muted)}
+footer{font-family:var(--mono);font-size:.75rem;color:var(--muted);border-top:1px solid var(--line);padding-top:20px}
+
+@media (max-width:860px){
+  .hero,.perf{grid-template-columns:1fr}
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .cases,.study-body,.lead{grid-template-columns:1fr}
+  .seeking{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .nav .me{width:100%}
+  .job{grid-template-columns:1fr;gap:10px}
+}
+@media (max-width:520px){
+  body{padding-inline:16px}
+  .bar,.axis{grid-template-columns:minmax(0,110px) minmax(0,1fr) 40px}
+  .foot,.seeking{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:no-preference){
+  .fill{animation:grow 900ms cubic-bezier(.2,.7,.2,1) both}
+  @keyframes grow{from{transform:scaleX(.15);transform-origin:left}to{transform:scaleX(1);transform-origin:left}}
+}
+</style>
+</head><body>
+
+<div class="wrap">
+  <nav class="nav" aria-label="Sections"><span class="me">Bhargavi Devalla</span><a href="#work">Case studies</a><a href="#demos">Demo reports</a><a href="#leadership">Leadership</a><a href="#experience">Experience</a><a href="#toolkit">Toolkit</a><a href="#contact">Contact</a><a href="https://drive.google.com/file/d/1G9B8PFLywG_qjL6Tgpxw3oW9UL4_0tSQ/view?usp=drive_link" target="_blank" rel="noopener">Resume ↗</a></nav>
+
+  <header class="hero">
+    <div>
+      <div class="status"><i></i>Open to full-time roles · Remote, Denver area or relocation</div>
+      <h1>Bhargavi Devalla</h1>
+      <p class="role">Senior BI Developer · Power BI &amp; Microsoft Fabric</p>
+      <p class="summary">I build Power BI and Fabric analytics for healthcare and insurance teams. Nine years of semantic modeling, DAX performance tuning and governed self-service reporting, most recently for financial, membership and claims reporting at Humana.</p>
+    </div>
+    <aside id="contact" class="contact" aria-label="Contact details">
+      <div class="contact-row"><span class="k">Email</span><span class="v" id="c-email">devalla.bhargavi3@gmail.com</span><button class="copy" data-copy="c-email">Copy</button></div>
+      <div class="contact-row"><span class="k">Phone</span><span class="v" id="c-phone">+1 (303) 269-9454</span><button class="copy" data-copy="c-phone">Copy</button></div>
+      <div class="contact-row"><span class="k">Based</span><span class="v">Parker, Colorado · open to relocation</span><span></span></div>
+      <a class="resume-btn" href="https://drive.google.com/file/d/1G9B8PFLywG_qjL6Tgpxw3oW9UL4_0tSQ/view?usp=drive_link" target="_blank" rel="noopener">View resume (PDF) <span aria-hidden="true">↗</span></a>
+      <div class="badge">
+        <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 2 36 11v18L20 38 4 29V11z" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.5"/><path d="M13 20.5l4.5 4.5L27 15.5" fill="none" stroke="var(--accent)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div><b>Microsoft Certified: Power BI Data Analyst Associate</b><span>Exam PL-300</span></div>
+      </div>
+    </aside>
+  </header>
+
+  <section aria-label="Impact at a glance">
+    <div class="kpis">
+      <div class="kpi"><div class="n">9<small>+ yrs</small></div><div class="l">Building enterprise Power BI</div><div class="src">2017 → today</div></div>
+      <div class="kpi"><div class="n">5,000<small>+</small></div><div class="l">Monthly unique users on dashboards I published</div><div class="src">Aon · via Genpact</div></div>
+      <div class="kpi"><div class="n">~200<small>hrs</small></div><div class="l">Analyst hours reclaimed per quarter through automation</div><div class="src">Aon · via Genpact</div></div>
+      <div class="kpi"><div class="n">45→80<small>%</small></div><div class="l">BI-tool adoption in six months after analyst training</div><div class="src">Aon · via Genpact</div></div>
+    </div>
+  </section>
+
+  <section class="seeking" aria-label="What I'm looking for">
+    <div><h3>Roles</h3><ul><li>Senior BI Developer</li><li>BI Engineer</li><li>Power BI &amp; Fabric Analytics Engineer</li></ul></div>
+    <div><h3>Industries</h3><ul><li>Healthcare &amp; health plans</li><li>Insurance</li><li>Financial analytics</li></ul></div>
+    <div><h3>Where</h3><ul><li>Remote</li><li>Denver metro, Colorado</li><li>Open to relocation</li></ul></div>
+    <div><h3>What I bring</h3><ul><li>Semantic models built to scale</li><li>DAX performance tuning</li><li>CI/CD and governance for BI</li></ul></div>
+  </section>
+
+  <section class="perf" aria-labelledby="perf-h">
+    <div>
+      <div class="eyebrow">Performance tuning</div>
+      <h2 id="perf-h" style="margin-top:8px">Faster reports, every engagement</h2>
+      <p>I read query plans in DAX Studio, restructure models and measures, and tune indexing and partitioning upstream. These are the load-time and query-time reductions from each role.</p>
+    </div>
+    <div class="bars" role="img" aria-label="Reduction in time: 60% DAX execution at Humana, 40% dashboard load at Humana, 35% dashboard load at Aon, 25% report load at Aspen">
+      <div class="bar"><span>DAX execution · Humana</span><div class="track"><div class="fill" style="width:60%"></div></div><span class="pct">−60%</span></div>
+      <div class="bar"><span>Dashboard load · Humana</span><div class="track"><div class="fill" style="width:40%"></div></div><span class="pct">−40%</span></div>
+      <div class="bar"><span>Dashboard load · Aon</span><div class="track"><div class="fill" style="width:35%"></div></div><span class="pct">−35%</span></div>
+      <div class="bar"><span>Report load · Aspen</span><div class="track"><div class="fill" style="width:25%"></div></div><span class="pct">−25%</span></div>
+      <div class="axis" aria-hidden="true"><span></span><div><span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span></div><span></span></div>
+    </div>
+  </section>
+
+  <section id="work" aria-labelledby="work-h">
+    <div class="section-head"><h2 id="work-h">Case studies</h2><span class="eyebrow">Problem · approach · result</span></div>
+    <div class="studies">
+
+      <article class="study">
+        <div class="study-head"><span class="tag">Humana · Senior BI Developer · 2025–present</span><h3>Claims and membership reporting on Fabric, with Direct Lake</h3></div>
+        <div class="diagram">
+          <svg viewBox="0 0 1000 250" role="img" aria-label="Data flow: Google BigQuery, Azure Databricks, Oracle and Azure SQL feed Fabric Data Pipelines and PySpark notebooks with data quality checks, which land in a Fabric Lakehouse on OneLake. A Direct Lake semantic model with star schema, DAX and row-level security reads the Lakehouse and serves Power BI apps, executive dashboards and GPT-generated summaries.">
+            <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z"/></marker></defs>
+            <text class="lbl" x="10" y="20">SOURCES</text><text class="lbl" x="215" y="20">INGEST &amp; QUALITY</text><text class="lbl" x="445" y="20">STORE</text><text class="lbl" x="655" y="20">MODEL</text><text class="lbl" x="860" y="20">CONSUME</text>
+            <rect class="box" x="10" y="36" width="150" height="36" rx="5"/><text x="22" y="59">Google BigQuery</text>
+            <rect class="box" x="10" y="86" width="150" height="36" rx="5"/><text x="22" y="109">Azure Databricks</text>
+            <rect class="box" x="10" y="136" width="150" height="36" rx="5"/><text x="22" y="159">Oracle</text>
+            <rect class="box" x="10" y="186" width="150" height="36" rx="5"/><text x="22" y="209">Azure SQL</text>
+            <path class="arr" d="M160 54 C185 54 185 120 208 126"/><path class="arr" d="M160 104 C185 104 190 124 208 128"/><path class="arr" d="M160 154 C185 154 190 132 208 130"/><path class="arr" d="M160 204 C185 204 185 136 208 132"/>
+            <rect class="box" x="210" y="46" width="180" height="168" rx="5"/>
+            <text class="h" x="224" y="72">Fabric</text><text x="224" y="100">Data Pipelines</text><text x="224" y="124">PySpark Notebooks</text><text x="224" y="148">Data quality checks</text><text x="224" y="172">Validation &amp;</text><text x="224" y="190">reconciliation</text>
+            <path class="arr" d="M390 130 L438 130"/>
+            <rect class="box hi" x="440" y="76" width="160" height="108" rx="5"/>
+            <text class="h" x="454" y="102">OneLake</text><text x="454" y="128">Fabric Lakehouse</text><text x="454" y="152">Delta tables</text>
+            <path class="arr" d="M600 130 L648 130"/><text class="lbl" x="604" y="120">DIRECT</text><text class="lbl" x="610" y="146">LAKE</text>
+            <rect class="box sig" x="650" y="56" width="165" height="148" rx="5"/>
+            <text class="h" x="664" y="82">Semantic model</text><text x="664" y="108">Star schema</text><text x="664" y="130">Advanced DAX</text><text x="664" y="152">Row-level security</text><text x="664" y="174">Composite models</text>
+            <path class="arr" d="M815 130 L858 130"/>
+            <rect class="box" x="860" y="66" width="130" height="128" rx="5"/>
+            <text class="h" x="872" y="92">Power BI apps</text><text x="872" y="118">Finance</text><text x="872" y="140">Membership</text><text x="872" y="162">Claims</text><text x="872" y="184">GPT summaries</text>
+          </svg>
+        </div>
+        <div class="study-body">
+          <div><h4>Problem</h4><p>Financial, membership and claims reporting pulled from BigQuery, Databricks, Oracle and Azure SQL into large-scale models. Leadership needed fast, validated dashboards and quicker turnaround on ad hoc analysis.</p></div>
+          <div><h4>Approach</h4><ul>
+            <li>Centralized upstream work in Fabric Data Pipelines and PySpark notebooks, with data quality checks before data reaches the model.</li>
+            <li>Implemented Direct Lake reporting over the Fabric Lakehouse.</li>
+            <li>Built reusable star-schema semantic models, then profiled slow measures in DAX Studio and restructured them.</li>
+            <li>Tuned indexing and partitioning, and added GPT natural-language summaries to executive dashboards.</li>
+          </ul></div>
+          <div><h4>Result</h4><div class="outcomes">
+            <div class="outcome"><b>−60%</b><span>execution time on the slowest DAX queries</span></div>
+            <div class="outcome"><b>−40%</b><span>dashboard load time</span></div>
+            <div class="outcome"><b>&lt;1s</b><span>query response on large-scale reporting models</span></div>
+          </div></div>
+        </div>
+      </article>
+
+      <article class="study">
+        <div class="study-head"><span class="tag">Humana · DevOps for BI</span><h3>Source-controlled releases from Dev to Prod</h3></div>
+        <div class="diagram">
+          <svg viewBox="0 0 1000 200" role="img" aria-label="Release flow: reports and semantic models saved as PBIP and TMDL files in Power BI Desktop are committed to an Azure DevOps Git repository and peer reviewed, then a CI/CD pipeline promotes them through Power BI Deployment Pipelines from Dev to Test to Prod, with parameter rules switching data sources at each stage.">
+            <defs><marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 10 5 0 10z"/></marker></defs>
+            <rect class="box" x="10" y="60" width="175" height="96" rx="5"/><text class="h" x="24" y="86">Power BI Desktop</text><text x="24" y="112">PBIP project</text><text x="24" y="134">TMDL model files</text>
+            <path class="arr2" d="M185 108 L228 108"/><text class="lbl" x="186" y="96">COMMIT</text>
+            <rect class="box" x="230" y="60" width="180" height="96" rx="5"/><text class="h" x="244" y="86">Azure DevOps</text><text x="244" y="112">Git repository</text><text x="244" y="134">Pull request review</text>
+            <path class="arr2" d="M410 108 L453 108"/>
+            <rect class="box hi" x="455" y="60" width="140" height="96" rx="5"/><text class="h" x="469" y="86">CI/CD</text><text x="469" y="112">Build &amp;</text><text x="469" y="134">deploy</text>
+            <path class="arr2" d="M595 108 L638 108"/>
+            <rect class="grp" x="640" y="30" width="350" height="156" rx="8"/><text class="lbl" x="654" y="50">POWER BI DEPLOYMENT PIPELINES</text>
+            <rect class="box" x="656" y="72" width="90" height="72" rx="5"/><text class="h" x="684" y="113">Dev</text>
+            <path class="arr2" d="M746 108 L770 108"/>
+            <rect class="box" x="772" y="72" width="90" height="72" rx="5"/><text class="h" x="798" y="113">Test</text>
+            <path class="arr2" d="M862 108 L886 108"/>
+            <rect class="box sig" x="888" y="72" width="90" height="72" rx="5"/><text class="h" x="914" y="113">Prod</text>
+            <text class="lbl" x="656" y="170">PARAMETER RULES SWAP DATA SOURCES PER STAGE</text>
+          </svg>
+        </div>
+        <div class="study-body">
+          <div><h4>Problem</h4><p>Promoting reports between environments required manual data-source reconfiguration, which introduced release errors.</p></div>
+          <div><h4>Approach</h4><ul>
+            <li>Saved reports and semantic models as PBIP/TMDL so every change is a readable diff in Git.</li>
+            <li>Routed changes through pull requests in Azure DevOps, with peer review of DAX, SQL and model design.</li>
+            <li>Set up parameterized Dev, Test and Prod stages in Power BI Deployment Pipelines, driven by Azure DevOps CI/CD.</li>
+          </ul></div>
+          <div><h4>Result</h4><div class="outcomes">
+            <div class="outcome"><b>0</b><span>manual data-source changes when promoting a release</span></div>
+            <div class="outcome"><b>Fewer</b><span>release errors, with full version history for every model</span></div>
+          </div></div>
+        </div>
+      </article>
+
+      <article class="study">
+        <div class="study-head"><span class="tag">Genpact · Client: Aon Insurance · 2022–2024</span><h3>Self-service analytics for a global brokerage</h3></div>
+        <div class="study-body">
+          <div><h4>Problem</h4><p>Senior finance and operations leaders across business units needed consistent revenue, cost and claims reporting. Recurring reports and data prep were largely manual, and BI-tool adoption stood at 45%.</p></div>
+          <div><h4>Approach</h4><ul>
+            <li>Built semantic models with 50+ DAX measures: time intelligence, ranking and dynamic benchmarks.</li>
+            <li>Secured data with row- and object-level security; configured gateways for SharePoint and SQL Server.</li>
+            <li>Automated reporting and alerts with Power Automate and scheduled SQL jobs; moved data prep to PySpark.</li>
+            <li>Added Python-based DAX regression tests to monthly releases, and trained analysts on self-service.</li>
+          </ul></div>
+          <div><h4>Result</h4><div class="outcomes">
+            <div class="outcome"><b>5,000+</b><span>monthly unique users</span></div>
+            <div class="outcome"><b>45→80%</b><span>BI-tool adoption in six months</span></div>
+            <div class="outcome"><b>~200 hrs</b><span>analyst time reclaimed per quarter</span></div>
+            <div class="outcome"><b>−35%</b><span>dashboard load time</span></div>
+          </div></div>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <section id="demos" aria-labelledby="demo-h">
+    <div class="section-head"><h2 id="demo-h">Demo reports</h2><span class="eyebrow">Interactive · public CMS data</span></div>
+    <div class="demos">
+      <a class="demo" href="ma-report.html">
+        <img class="shot" src="ma-preview.jpg" alt="Medicare Advantage Market Tracker report: KPI cards, market share trend and monthly crossover chart" width="930" height="570" loading="lazy">
+        <span class="tag">Insurance · Medicare Monthly Enrollment</span>
+        <h3>Medicare Advantage Market Tracker</h3>
+        <p>How enrollment is shifting from Original Medicare to Medicare Advantage in every state, 2013 to June 2026. State slicer, tile map, monthly trend and ranked changes, plus the star schema and DAX measures behind it.</p>
+        <div class="stat"><b>Feb 2024</b><span>the month Medicare Advantage and other plans passed Original Medicare nationally</span></div>
+        <span class="open">Open interactive report →</span>
+      </a>
+      <a class="demo" href="cost-report.html">
+        <img class="shot" src="cost-preview.jpg" alt="Medicare Cost and Utilization Explorer report: KPI cards, spending trend and state ranking" width="930" height="570" loading="lazy">
+        <span class="tag">Healthcare · Medicare Geographic Variation</span>
+        <h3>Medicare Cost &amp; Utilization Explorer</h3>
+        <p>Spending, readmissions, ER visits and inpatient stays for Original Medicare by state, 2014–2024. Measure switcher, state ranking, spending mix and a spend-versus-readmissions scatter, with the DAX behind each figure.</p>
+        <div class="stat"><b>+37%</b><span>growth in U.S. standardized spending per beneficiary, 2014–2024</span></div>
+        <span class="open">Open interactive report →</span>
+      </a>
+    </div>
+  </section>
+
+  <section id="leadership" aria-labelledby="lead-h">
+    <div class="section-head"><h2 id="lead-h">How I lead</h2><span class="eyebrow">Beyond the individual report</span></div>
+    <div class="lead">
+      <article><h3>Code review and mentoring</h3><p>I review teammates' Power BI reports, DAX, SQL, data models and ETL work, and pair with them on production issues until they're resolved.</p><span class="proof">Humana · peer reviews</span></article>
+      <article><h3>Team standards</h3><p>I help keep shared standards for naming, documentation, data validation, row-level security and report development, so any report can be picked up by anyone on the team.</p><span class="proof">Humana · team standards</span></article>
+      <article><h3>Enabling self-service</h3><p>I train analysts to build and use reports on governed models, so the business gets answers without waiting in a queue.</p><span class="proof">Aon · adoption 45% → 80% in six months</span></article>
+      <article><h3>Quality and reliability</h3><p>I own validation and reconciliation across reporting layers, write regression tests for DAX, and run workspaces, refreshes and gateways in production.</p><span class="proof">Aspen · high-priority incidents down 25–30%</span></article>
+    </div>
+  </section>
+
+  <section id="experience" aria-labelledby="exp-h">
+    <div class="section-head"><h2 id="exp-h">Experience</h2><span class="eyebrow">Healthcare &amp; insurance</span></div>
+    <div class="jobs">
+      <article class="job">
+        <div class="when"><b>Humana</b><span>Jul 2025 – Present</span><span>Remote · Dallas team</span></div>
+        <div>
+          <h3>Senior BI Developer</h3>
+          <ul>
+            <li>Deliver end-to-end Power BI solutions for financial, membership and claims reporting, from ingestion to enterprise dashboard deployment.</li>
+            <li>Design reusable semantic models (star schema, hierarchies, composite models, advanced DAX) with sub-second query performance.</li>
+            <li>Cut slow DAX execution up to 60% using DAX Studio query plans; reduced dashboard load times 40% through indexing, partitioning and query tuning.</li>
+            <li>Embed GPT-powered natural-language summaries in executive dashboards, shortening turnaround on ad hoc analysis requests.</li>
+            <li>Designed role-based Power Apps for internal QA teams covering test case management, defect logging and approvals, with Power Automate escalating critical failures to stakeholders through Teams and email.</li>
+            <li>Built reusable Power Apps component framework (PCF) controls for model-driven apps, standardizing data entry for financial reporting workflows and cutting development time for later app iterations.</li>
+            <li>Mentor through peer reviews of reports, DAX, SQL and ETL; help maintain team standards for naming, documentation, validation and RLS.</li>
+            <li>Own data validation and reconciliation; administer workspaces, apps, refresh schedules and gateways.</li>
+          </ul>
+          <div class="chips"><span class="chip">−60% DAX time</span><span class="chip">−40% load time</span><span class="chip t">Fabric</span><span class="chip t">Direct Lake</span><span class="chip t">PySpark</span><span class="chip t">Azure DevOps</span><span class="chip t">PBIP/TMDL</span><span class="chip t">Power Apps</span></div>
+        </div>
+      </article>
+      <article class="job">
+        <div class="when"><b>Genpact</b><span>May 2022 – Aug 2024</span><span>Hyderabad, India</span></div>
+        <div>
+          <h3>BI Developer</h3>
+          <p class="client">Client: Aon Insurance</p>
+          <ul>
+            <li>Developed enterprise Power BI reporting for Aon's global brokerage operations, used by senior finance and operations leadership.</li>
+            <li>Published dashboards with drill-through, tooltips and bookmarks reaching 5,000+ monthly unique users.</li>
+            <li>Automated recurring reporting and alerting with Power Automate and scheduled SQL jobs, reclaiming ~200 analyst hours per quarter.</li>
+            <li>Built semantic models with 50+ DAX measures (time intelligence, ranking, dynamic benchmarks); tuned DAX to cut load times ~35%.</li>
+            <li>Built PySpark data-prep jobs and Python-based DAX regression tests, saving ~15 hours per week.</li>
+            <li>Trained analysts on self-service analytics, raising adoption from 45% to 80% in six months.</li>
+            <li>Built a Power Apps quality assurance tracker connected to Power Automate and Power BI, automating test case logging, escalations and live KPI dashboards so QA teams resolved issues faster.</li>
+          </ul>
+          <div class="chips"><span class="chip">5,000+ users</span><span class="chip">~200 hrs/qtr saved</span><span class="chip">45→80% adoption</span><span class="chip t">RLS / OLS</span><span class="chip t">Power Automate</span><span class="chip t">Power Apps</span></div>
+        </div>
+      </article>
+      <article class="job">
+        <div class="when"><b>Infosys</b><span>Jun 2017 – May 2022</span><span>Hyderabad, India</span></div>
+        <div>
+          <h3>BI Developer</h3>
+          <p class="client">Client: Aspen Insurance</p>
+          <ul>
+            <li>Developed Power BI reports and financial analytics for policy, premium and claims operations.</li>
+            <li>Delivered analytics and automation that reduced high-priority incidents by 25–30%.</li>
+            <li>Optimized slow visuals and DAX queries, cutting average report load time ~25%.</li>
+            <li>Built KPIs and forecasting models; helped drive agile adoption across business and technology teams.</li>
+            <li>Implemented RLS and security groups for regulatory compliance; built Azure Data Factory pipelines from Azure SQL and Blob Storage.</li>
+          </ul>
+          <div class="chips"><span class="chip">−25–30% P1 incidents</span><span class="chip">−25% load time</span><span class="chip t">Azure Data Factory</span><span class="chip t">SQL Server</span></div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section id="toolkit" aria-labelledby="skills-h">
+    <div class="section-head"><h2 id="skills-h">Toolkit, as a model</h2><span class="eyebrow">Star schema · 1 fact, 6 dimensions</span></div>
+    <div class="model">
+      <svg viewBox="0 0 900 460" role="img" aria-label="Star schema diagram of skills: a central fact table of delivered analytics linked to six dimension tables: Reporting, Fabric, Azure and cloud, Modeling, Languages, and Delivery.">
+        <!-- relationships -->
+        <g class="rel">
+          <path d="M340 190 L230 110"/><path d="M340 230 L230 230"/><path d="M340 270 L230 350"/>
+          <path d="M560 190 L670 110"/><path d="M560 230 L670 230"/><path d="M560 270 L670 350"/>
+        </g>
+        <g class="card">
+          <text x="238" y="122">*</text><text x="332" y="186">1</text>
+          <text x="238" y="224">*</text><text x="332" y="226">1</text>
+          <text x="238" y="342">*</text><text x="332" y="282">1</text>
+          <text x="655" y="122">*</text><text x="564" y="186">1</text>
+          <text x="655" y="224">*</text><text x="564" y="226">1</text>
+          <text x="655" y="342">*</text><text x="564" y="282">1</text>
+        </g>
+        <!-- fact -->
+        <g class="fact">
+          <rect class="tbl" x="340" y="150" width="220" height="160" rx="6"/>
+          <rect class="hdr" x="340" y="150" width="220" height="28" rx="6"/>
+          <text class="tn" x="354" y="169">fct_DeliveredAnalytics</text>
+          <text x="354" y="200">Domain = Healthcare, Insurance</text>
+          <text x="354" y="220">Years = 9+</text>
+          <text x="354" y="240">MonthlyUsers = 5,000+</text>
+          <text x="354" y="260">Certification = PL-300</text>
+          <text x="354" y="280">Education = B.Tech EEE</text>
+          <text x="354" y="298">Status = Open to work</text>
+        </g>
+        <!-- dims left -->
+        <g><rect class="tbl" x="20" y="30" width="210" height="140" rx="6"/><rect class="hdr" x="20" y="30" width="210" height="28" rx="6"/>
+          <text class="tn" x="32" y="49">dim_Reporting</text>
+          <text x="32" y="78">Power BI · DAX · Power Query</text><text x="32" y="98">Semantic Models · DAX Studio</text><text x="32" y="118">Service · Gateway · Embedded</text><text x="32" y="138">Power Apps · Power Automate</text><text x="32" y="158">Copilot for DAX/SQL</text></g>
+        <g><rect class="tbl" x="20" y="180" width="210" height="100" rx="6"/><rect class="hdr" x="20" y="180" width="210" height="28" rx="6"/>
+          <text class="tn" x="32" y="199">dim_Modeling</text>
+          <text x="32" y="228">Star &amp; Snowflake Schema</text><text x="32" y="248">Dimensional Modeling</text><text x="32" y="268">ETL Design · RLS / OLS</text></g>
+        <g><rect class="tbl" x="20" y="290" width="210" height="120" rx="6"/><rect class="hdr" x="20" y="290" width="210" height="28" rx="6"/>
+          <text class="tn" x="32" y="309">dim_Languages</text>
+          <text x="32" y="338">SQL · T-SQL</text><text x="32" y="358">Python · PySpark</text><text x="32" y="378">Power Query (M) · DAX</text><text x="32" y="398">MS SQL Server · Oracle</text></g>
+        <!-- dims right -->
+        <g><rect class="tbl" x="670" y="30" width="210" height="140" rx="6"/><rect class="hdr" x="670" y="30" width="210" height="28" rx="6"/>
+          <text class="tn" x="682" y="49">dim_Fabric</text>
+          <text x="682" y="78">Fabric Lakehouse</text><text x="682" y="98">Direct Lake mode</text><text x="682" y="118">Data Pipelines · OneLake</text><text x="682" y="138">Fabric Notebooks</text><text x="682" y="158">PySpark</text></g>
+        <g><rect class="tbl" x="670" y="180" width="210" height="100" rx="6"/><rect class="hdr" x="670" y="180" width="210" height="28" rx="6"/>
+          <text class="tn" x="682" y="199">dim_Cloud</text>
+          <text x="682" y="228">Azure Data Factory · Azure SQL</text><text x="682" y="248">Azure Databricks · Blob</text><text x="682" y="268">Google BigQuery</text></g>
+        <g><rect class="tbl" x="670" y="290" width="210" height="120" rx="6"/><rect class="hdr" x="670" y="290" width="210" height="28" rx="6"/>
+          <text class="tn" x="682" y="309">dim_Delivery</text>
+          <text x="682" y="338">Azure DevOps CI/CD</text><text x="682" y="358">Deployment Pipelines</text><text x="682" y="378">PBIP / TMDL source control</text><text x="682" y="398">Agile · Scrum · SDLC</text></g>
+      </svg>
+    </div>
+    <p class="note">Drawn the way I'd lay out a Power BI model view: one fact, related one-to-many to each dimension.</p>
+  </section>
+
+  <section class="foot" aria-label="Certification and education">
+    <div class="box"><span class="eyebrow">Certification</span><h3>Microsoft Certified: Power BI Data Analyst Associate</h3><p>PL-300</p></div>
+    <div class="box"><span class="eyebrow">Education</span><h3>B.Tech, Electrical &amp; Electronics Engineering</h3><p>KL University, 2017</p></div>
+  </section>
+
+  <footer>Bhargavi Devalla · Senior BI Developer · Parker, CO · Open to relocation · devalla.bhargavi3@gmail.com · +1 (303) 269-9454</footer>
+</div>
+
+<script>
+document.querySelectorAll('.copy').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    var el=document.getElementById(btn.dataset.copy); var text=el.textContent.trim();
+    var done=function(){btn.textContent='Copied';setTimeout(function(){btn.textContent='Copy'},1500)};
+    var fallback=function(){var r=document.createRange();r.selectNodeContents(el);var s=getSelection();s.removeAllRanges();s.addRange(r);btn.textContent='Selected'};
+    try{navigator.clipboard.writeText(text).then(done,fallback)}catch(e){fallback()}
+  });
+});
+</script>
+
+</body></html>
