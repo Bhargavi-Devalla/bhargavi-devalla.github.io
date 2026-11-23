@@ -34,10 +34,13 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-off
 .section-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:24px}
 
 /* Hero */
-.hero{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:40px;align-items:end}
+.hero{display:grid;grid-template-columns:minmax(0,1fr);gap:32px;justify-items:center;padding-top:16px;min-width:0}
+.wrap{grid-template-columns:minmax(0,1fr)}
+.hero>div:first-child{text-align:center;width:100%;min-width:0}
+.hero .contact{width:100%;max-width:560px}
 .hero h1{font-size:clamp(2.6rem,7vw,4.6rem);font-weight:800;letter-spacing:-.02em}
 .hero .role{font-family:var(--display);font-size:clamp(1.15rem,2.4vw,1.5rem);font-weight:500;color:var(--accent);margin-top:10px}
-.hero .summary{margin-top:20px;max-width:62ch;color:var(--muted);font-size:1.05rem}
+.hero .summary{margin-top:20px;margin-inline:auto;max-width:44ch;text-wrap:balance;color:var(--muted);font-size:1.05rem}
 .status{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:.8rem;background:var(--accent-soft);color:var(--accent);padding:6px 12px;border-radius:999px;margin-bottom:20px}
 .status i{width:8px;height:8px;border-radius:50%;background:var(--accent);display:block}
 .contact{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px;display:grid;gap:14px}
@@ -50,6 +53,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-off
 .badge svg{flex:none}
 .badge b{display:block;font-size:.9rem}
 .badge span{font-size:.8rem;color:var(--muted)}
+.badge2{border-top:0;padding-top:0}
 
 /* KPI strip */
 .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}
@@ -164,7 +168,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-off
 .demo .open{font-family:var(--mono);font-size:.8rem;color:var(--accent)}
 @media (max-width:860px){.demos{grid-template-columns:1fr}}
 .foot{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
-.foot .box{border-top:2px solid var(--ink);padding-top:14px;display:grid;gap:6px}
+.foot .box{border-top:2px solid var(--ink);padding-top:14px;display:grid;gap:6px;align-content:start}
 .foot .box p{color:var(--muted)}
 footer{font-family:var(--mono);font-size:.75rem;color:var(--muted);border-top:1px solid var(--line);padding-top:20px}
 
@@ -206,6 +210,10 @@ footer{font-family:var(--mono);font-size:.75rem;color:var(--muted);border-top:1p
       <div class="badge">
         <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 2 36 11v18L20 38 4 29V11z" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.5"/><path d="M13 20.5l4.5 4.5L27 15.5" fill="none" stroke="var(--accent)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
         <div><b>Microsoft Certified: Power BI Data Analyst Associate</b><span>Exam PL-300</span></div>
+      </div>
+      <div class="badge badge2">
+        <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 2 36 11v18L20 38 4 29V11z" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.5"/><path d="M13 20.5l4.5 4.5L27 15.5" fill="none" stroke="var(--accent)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div><b>Microsoft Certified: Fabric Analytics Engineer Associate</b><span>Exam DP-600</span></div>
       </div>
     </aside>
   </header>
@@ -453,7 +461,7 @@ footer{font-family:var(--mono);font-size:.75rem;color:var(--muted);border-top:1p
           <text x="354" y="200">Domain = Healthcare, Insurance</text>
           <text x="354" y="220">Years = 8+</text>
           <text x="354" y="240">MonthlyUsers = 5,000+</text>
-          <text x="354" y="260">Certification = PL-300</text>
+          <text x="354" y="260">Certs = PL-300 · DP-600</text>
           <text x="354" y="280">Education = B.Tech EEE</text>
           <text x="354" y="298">Status = Open to work</text>
         </g>
@@ -482,8 +490,8 @@ footer{font-family:var(--mono);font-size:.75rem;color:var(--muted);border-top:1p
     <p class="note">Drawn the way I'd lay out a Power BI model view: one fact, related one-to-many to each dimension.</p>
   </section>
 
-  <section class="foot" aria-label="Certification and education">
-    <div class="box"><span class="eyebrow">Certification</span><h3>Microsoft Certified: Power BI Data Analyst Associate</h3><p>PL-300</p></div>
+  <section class="foot" aria-label="Certifications and education">
+    <div class="box"><span class="eyebrow">Certifications</span><h3>Microsoft Certified: Fabric Analytics Engineer Associate</h3><p>DP-600</p><h3 style="margin-top:10px">Microsoft Certified: Power BI Data Analyst Associate</h3><p>PL-300</p></div>
     <div class="box"><span class="eyebrow">Education</span><h3>B.Tech, Electrical &amp; Electronics Engineering</h3><p>KL University, 2017</p></div>
   </section>
 
@@ -500,5 +508,6 @@ document.querySelectorAll('.copy').forEach(function(btn){
   });
 });
 </script>
+
 
 </body></html>
